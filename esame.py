@@ -18,7 +18,7 @@ class CSVFile():
 class CSVTimeSeriesFile(CSVFile):
 
     #inizializzo
-    def __init__(self, name = "data.csv"):
+    def __init__(self, name):
 
         self.name = name
 
@@ -59,3 +59,12 @@ class compute_avg_monthly_difference():
     #return una lista di 12 elementi che rappresenta la differenza media
     #tra un anno e il seguente
     # [ 16.25 , 16 , 23 ...]
+
+
+#----------programma-----------
+
+time_series_file = CSVTimeSeriesFile("data.csv")
+
+time_series = time_series_file.get_data()
+
+print(time_series)

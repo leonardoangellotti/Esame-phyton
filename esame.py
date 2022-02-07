@@ -17,33 +17,37 @@ class CSVFile():
 #classe CVS file
 class CSVTimeSeriesFile(CSVFile):
 
-    #inizializzo
-    def __init__(self, name):
+    try:
+        #inizializzo
+        def __init__(self, name):
 
-        self.name = name
+            self.name = name
 
-        self.my_file = open(self.name, 'r')
+            self.my_file = open(self.name, 'r')
 
-    #prende data e sales e li mette in una lista
-    def get_data(self):
+        #prende data e sales e li mette in una lista
+        def get_data(self):
 
-        lista = []
+            lista = []
 
-        #divide gli elementi nel file e li aggiune ad una lista
-        for lines in self.my_file:
-            
-            line = lines.split(',')
+            #divide gli elementi nel file e li aggiune ad una lista
+            for lines in self.my_file:
+                
+                line = lines.split(',')
 
-            lista.append(line)
-            
-        #chiude il file
-        self.my_file.close()
+                lista.append(line)
+                
+            #chiude il file
+            self.my_file.close()
 
-        #ritorna la lista
-        return lista
+            #ritorna la lista
+            return lista
+        
+            #chiude il file in modalità lettura
+            self.my_file.close()
     
-        #chiude il file in modalità lettura
-        self.my_file.close()
+    except:
+        print("qualcosa non funziona, non sò cosa")
 
 #return una lista di 12 elementi che rappresenta la differenza media
 #tra un anno e il seguente
@@ -51,67 +55,71 @@ class CSVTimeSeriesFile(CSVFile):
 
 class compute_avg_monthly_difference():
 
-    def __init__(self, time_series, first_year, last_year):
+    try:
 
-        self.time_series = time_series
-        self.first_year = first_year
-        self.last_year = last_year
+        def __init__(self, time_series, first_year, last_year):
 
-    def diff(self):
+            self.time_series = time_series
+            self.first_year = first_year
+            self.last_year = last_year
 
-        #lista della variazione della media
-        var_media = []
+        def diff(self):
 
-        #numero anni per cui dividere la somma per avere la media
-        n = self.last_year - self.first_year
+            #lista della variazione della media
+            var_media = []
 
-        #per ogni mese
-        for mese in range(1,12):
+            #numero anni per cui dividere la somma per avere la media
+            n = self.last_year - self.first_year
 
-            #lista dei valori corrispondenti quel mese negli anni
-            lista_mese = []
+            #per ogni mese
+            for mese in range(1,12):
 
-            #per tutti gli elementi nella serie temporale
-            for elementi in time_series:
+                #lista dei valori corrispondenti quel mese negli anni
+                lista_mese = []
 
-                #divide la data in anno e mese
-                data = elementi[0].split("-")
+                #per tutti gli elementi nella serie temporale
+                for elementi in time_series:
 
-                #se non è la prima riga
-                if data[0] != "date":
+                    #divide la data in anno e mese
+                    data = elementi[0].split("-")
 
-                    #per tutti gli anni inclusi nell'intervallo 
-                    if (self.first_year <= int(data[0]) <= self.last_year):
-                    
-                        #si considera il mese corrispondente 
-                        if int(data[1]) == mese:
+                    #se non è la prima riga
+                    if data[0] != "date":
 
-                            #si aggiunge alla lista mesi il numero passeggeri corrispondente 
-                            lista_mese.append(int(elementi[1]))
+                        #per tutti gli anni inclusi nell'intervallo 
+                        if (self.first_year <= int(data[0]) <= self.last_year):
+                        
+                            #si considera il mese corrispondente 
+                            if int(data[1]) == mese:
 
-            #variabile somma per la somamtoria al numeratore 
-            somma = 0
+                                #si aggiunge alla lista mesi il numero passeggeri corrispondente 
+                                lista_mese.append(int(elementi[1]))
 
-            #per ogni anno in quel mese
-            for i in range(0, len(lista_mese) - 1):
+                #variabile somma per la somamtoria al numeratore 
+                somma = 0
 
-                #sommatoria passeggeri
-                somma = somma + (lista_mese[i + 1] - lista_mese[i])
+                #per ogni anno in quel mese
+                for i in range(0, len(lista_mese) - 1):
 
-            #si aggiunge alla lista la media
-            var_media.append(somma/n)
+                    #sommatoria passeggeri
+                    somma = somma + (lista_mese[i + 1] - lista_mese[i])
 
-        return var_media
+                #si aggiunge alla lista la media
+                var_media.append(somma/n)
 
+            return var_media
+    
+    except:
+        print("qualcosa non funziona, non sò cosa")
 
 #----------programma-----------
 
-time_series_file = CSVTimeSeriesFile("data.csv")
+#time_series_file = CSVTimeSeriesFile("data.csv")
 
-time_series = time_series_file.get_data()
+#time_series = time_series_file.get_data()
 
-print(time_series)
+#print(time_series)
 
-lista_media = compute_avg_monthly_difference(time_series, 1949, 1951).diff()
+#lista_media = compute_avg_monthly_difference(time_series, 1949, 1951).diff()
 
-print(lista_media)
+#print(lista_media)

@@ -19,11 +19,26 @@ class CSVTimeSeriesFile(CSVFile):
 
     try:
         #inizializzo
-        def __init__(self, name):
 
-            self.name = name
+        #se il file non si può aprire
+        try:
 
-            self.my_file = open(self.name, 'r')
+            def __init__(self, name):
+
+                self.name = name
+
+                #se il tipo del file è .csv
+                if self.name.split(".")[-1] == "csv":
+
+                    #apre il file
+                    self.my_file = open(self.name, 'r')
+
+                #altrimenti, se non ha estensione csv raise ExamException
+                else:
+                    raise ExamException("il file non ha estensione .csv")
+
+        except:
+            raise ExamException("file non trovato")
 
         #prende data e sales e li mette in una lista
         def get_data(self):

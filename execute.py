@@ -3,7 +3,7 @@ from esame import CSVTimeSeriesFile, compute_avg_monthly_difference, ExamExcepti
 
 #----------programma-----------
 
-time_series_file = CSVTimeSeriesFile("data err empty.csv")
+time_series_file = CSVTimeSeriesFile("data err.csv")
 
 time_series = time_series_file.get_data()
 

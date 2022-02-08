@@ -27,15 +27,21 @@ class CSVTimeSeriesFile(CSVFile):
 
                 self.name = name
 
-                #se il tipo del file è .csv
-                if self.name.split(".")[-1] == "csv":
+                #prova a cercare un'estensione del file
+                try:
 
-                    #apre il file
-                    self.my_file = open(self.name, 'r')
+                    #se il tipo del file è .csv
+                    if self.name.split(".")[-1] == "csv":
 
-                #altrimenti, se non ha estensione csv raise ExamException
-                else:
-                    raise ExamException("il file non ha estensione .csv")
+                        #apre il file
+                        self.my_file = open(self.name, 'r')
+
+                    #altrimenti, se non ha estensione csv raise ExamException
+                    else:
+                        raise ExamException("il file non ha estensione .csv")
+
+                except:
+                    raise ExamException("il file non si può aprire, deve avere un'estensione .csv")
 
         except:
             raise ExamException("file non trovato")
@@ -43,14 +49,20 @@ class CSVTimeSeriesFile(CSVFile):
         #prende data e sales e li mette in una lista
         def get_data(self):
 
+            #lista vuota in cui aggiunge la coppia di elementi data/passeggeri
             lista = []
 
-            #divide gli elementi nel file e li aggiune ad una lista
-            for lines in self.my_file:
-                
-                line = lines.split(',')
+            try:
 
-                lista.append(line)
+                #divide gli elementi nel file e li aggiune ad una lista
+                for lines in self.my_file:
+                    
+                    line = lines.split(',')
+
+                    lista.append(line)
+
+            except:
+                raise ExamException("il file non è leggibile riga per riga")
                 
             #chiude il file
             self.my_file.close()
@@ -69,11 +81,70 @@ class compute_avg_monthly_difference():
 
     try:
 
+        #inizializzo, serie temporale: primo anno e ultimo anno da considerare
         def __init__(self, time_series, first_year, last_year):
 
             self.time_series = time_series
+            #lista vuota che contiene time_series ripulita
+            self.t_s_clean = []
             self.first_year = first_year
             self.last_year = last_year
+
+            #si ripulisce time_series da errori di battitura o da dati non utili
+            #si copia in un nuovo file pulito che si userà per il calcolo
+
+            for riga in self.time_series:
+
+                #verifica correttezza della riga
+                try:
+
+                    #se il primo elemento contiene una data
+                    #il cui primo elemento è un anno: numero stringa convertibile in intero positivo maggiore di 1910 (prima non esistevano i voli di linea) e minore di 2022
+                    #secondo elemento è un mese: numero stringa convertibile in intero compreso tra uno e 12
+                    #e se il secondo elemento è un numero stringa convertibile in intero positivo maggiore di 0
+                    try:
+                        if int(riga[0].split('-')[0]) in range(1910,2022)  and int(riga[0].split('-')[1]) in range(1,12) and int(riga[1]) > 0:
+
+                            #allora è una normale riga su cui si può operare,
+                            #viene aggiunta alla serie temporale pulita
+                            self.t_s_clean.append(riga)
+
+                    #se non avviene niente di tutto questo
+                    #si passa alla riga successiva
+                    except:
+                        pass
+                #se qualcosa non dovesse rientrare in ogni caso
+                except:
+                    raise ExamException("il file è compromesso")
+
+            #stampa di controllo
+            for riga in self.t_s_clean:
+                print(riga)
+
+            #controllo se il tipo degli anni è stringa e non altri
+            if type(first_year) != str:
+
+                raise ExamException("il valore del primo anno non è di tipo stringa")
+
+            if type(last_year) != str:
+
+                raise ExamException("il valore dell'ultimo anno non è di tipo stringa")
+
+            #controllo se gli anni da stringa si possono convertire in numero intero
+            try:
+                int(first_year)
+            
+            except:
+                raise ExamException("il valore del primo anno non è convertibile a numero intero")
+
+            try:
+                int(last_year)
+            
+            except:
+                raise ExamException("il valore dell'ultimo anno non è convertibile a numero intero")
+
+            #controllo se il primo e l'ultimo anno sono contenuti nella serie temporale
+            
 
         def diff(self):
 
@@ -90,7 +161,7 @@ class compute_avg_monthly_difference():
                 lista_mese = []
 
                 #per tutti gli elementi nella serie temporale
-                for elementi in self.time_series:
+                for elementi in self.t_s_clean:
 
                     #divide la data in anno e mese
                     data = elementi[0].split("-")

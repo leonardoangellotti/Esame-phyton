@@ -1,5 +1,5 @@
 
-from esame import CSVTimeSeriesFile, compute_avg_monthly_difference, ExamException
+from esame import CSVTimeSeriesFile, compute_avg_monthly_difference
 
 #----------programma-----------
 

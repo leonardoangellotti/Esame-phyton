@@ -46,7 +46,7 @@ class CSVTimeSeriesFile(CSVFile):
         except:
             raise ExamException("file non trovato")
 
-        #prende data e sales e li mette in una lista
+        #prende data e n.passeggeri e li mette in una lista
         def get_data(self):
 
             #lista vuota in cui aggiunge la coppia di elementi data/passeggeri
@@ -71,7 +71,7 @@ class CSVTimeSeriesFile(CSVFile):
             return lista
     
     except:
-        print("qualcosa non funziona, non sò cosa")
+        raise ExamException("qualcosa non funziona, non sò cosa")
 
 #return una lista di 12 elementi che rappresenta la differenza media
 #tra un anno e il seguente
@@ -113,9 +113,17 @@ class compute_avg_monthly_difference():
                     #si passa alla riga successiva
                     except:
                         pass
+
                 #se qualcosa non dovesse rientrare in ogni caso
                 except:
                     raise ExamException("il file è compromesso")
+
+            #sapendo che i primi due elementi nella lista t_s_clean sono corretti e trattabili, elimina gli elementi che superano la lunghezza per ogni riga
+            for i in range(0, len(self.t_s_clean) - 1):
+
+                if len(self.t_s_clean[i]) > 2:
+
+                    self.t_s_clean[i] = self.t_s_clean[i][:2]
 
             #stampa di controllo
             for riga in self.t_s_clean:
@@ -143,9 +151,78 @@ class compute_avg_monthly_difference():
             except:
                 raise ExamException("il valore dell'ultimo anno non è convertibile a numero intero")
 
-            #controllo se il primo e l'ultimo anno sono contenuti nella serie temporale
-            
+            #controlla se il primo anno è minore del secondo
+            if int(self.first_year) >= int(self.last_year):
+         
+                raise ExamException("il primo anno non è strettamente minore del secondo")
 
+            #controllo se il primo e l'ultimo anno sono contenuti nella serie temporale (non è detto che i dati in input siano in ordine crescente)   
+            anni = []
+            
+            for riga in self.t_s_clean:
+
+                #aggiungo tutti gli anni in una lista temporanea in formato intero
+                anni.append(int(riga[0].split('-')[0]))
+
+            #controlla se si può fare il minimo e il massimo sulla lista anni
+            try:
+                min(anni)
+                max(anni)
+
+            except:
+                raise ExamException("Non si può operare su questo tipo di lista perchè non contiene alcun dato nel formato anno-mese/passeggeri")
+
+            #se la lista anni contiene solo un anno allora non è possibile fare una media mensile
+            if max(anni) == min(anni):
+
+                raise ExamException("non è possibile fare l'incremento medio mensile su un solo anno")
+                
+            #controlla se l'intervallo degli anni è contenuto nella lista
+            if (min(anni) <= int(self.first_year) < int(self.last_year) <= max(anni)) == False:
+
+                raise ExamException("l'intervallo degli anni non è contenuto nella lista")
+
+            #controllo se le date sono in ordine crescente senza ripetizioni
+            #controlla l'ordine degli anni
+            #dato l'elemento i-esimo
+            for i in range(0, len(self.t_s_clean) - 2):
+
+                #controlla i k-esimi elementi successivi
+                for k in range(i + 1, len(self.t_s_clean) - 1):
+
+                    #controlla l'ordine degli anni
+                    if int(self.t_s_clean[i][0].split("-")[0]) > int(self.t_s_clean[k][0].split("-")[0]):
+
+                        raise ExamException("la lista non è ordinata in ordine crescente per gli anni")
+            
+            #controlla l'ordine dei mesi
+            #dato l'elemento i_esimo
+            for i in range(0, len(self.t_s_clean) - 2):
+               
+                #considerato un anno
+                year = int(self.t_s_clean[i][0].split("-")[0])
+
+                lista_mesi = []
+
+                #se ci sono altri elementi successivi con quell'anno controlla se i mesi sono crescenti
+                for k in range(i + 1, len(self.t_s_clean) - 1):
+
+                    if int(self.t_s_clean[k][0].split("-")[0]) == year:
+
+                        #aggiunge i mesi di quell'anno ad una lista vuota
+                        lista_mesi.append(self.t_s_clean[k][0].split("-")[1])
+
+                #se ci sono più elementi con lo stesso mese
+                if len(lista_mesi) > 1:
+
+                    #controlla se i mesi sono crescenti per quell'anno
+                    for j in range(0, len(lista_mesi) - 2):
+
+                        if lista_mesi[j] > lista_mesi[j + 1]:
+
+                            raise ExamException("la lista non è ordinata in ordine crescente per i mesi")
+
+        #funzione differenza media mensile
         def diff(self):
 
             #lista della variazione della media
@@ -166,17 +243,16 @@ class compute_avg_monthly_difference():
                     #divide la data in anno e mese
                     data = elementi[0].split("-")
 
-                    #se non è la prima riga
-                    if data[0] != "date":
+                    #per tutti gli anni inclusi nell'intervallo 
+                    if (int(self.first_year) <= int(data[0]) <= int(self.last_year)):
+                    
+                        #si considera il mese corrispondente 
+                        if int(data[1]) == mese:
 
-                        #per tutti gli anni inclusi nell'intervallo 
-                        if (int(self.first_year) <= int(data[0]) <= int(self.last_year)):
-                        
-                            #si considera il mese corrispondente 
-                            if int(data[1]) == mese:
+                            #si aggiunge alla lista mesi il numero passeggeri corrispondente 
+                            lista_mese.append(int(elementi[1]))
 
-                                #si aggiunge alla lista mesi il numero passeggeri corrispondente 
-                                lista_mese.append(int(elementi[1]))
+                            #altrimenti non succede nulla e si và avanti al prossimo elemento
 
                 #variabile somma per la somamtoria al numeratore 
                 somma = 0
@@ -193,5 +269,5 @@ class compute_avg_monthly_difference():
             return var_media
     
     except:
-        print("qualcosa non funziona, non sò cosa")
+        raise ExamException("qualcosa non funziona, non sò cosa")
 

@@ -42,9 +42,6 @@ class CSVTimeSeriesFile(CSVFile):
 
             #ritorna la lista
             return lista
-        
-            #chiude il file in modalità lettura
-            self.my_file.close()
     
     except:
         print("qualcosa non funziona, non sò cosa")
@@ -69,7 +66,7 @@ class compute_avg_monthly_difference():
             var_media = []
 
             #numero anni per cui dividere la somma per avere la media
-            n = self.last_year - self.first_year
+            n = int(self.last_year) - int(self.first_year)
 
             #per ogni mese
             for mese in range(1,12):
@@ -78,7 +75,7 @@ class compute_avg_monthly_difference():
                 lista_mese = []
 
                 #per tutti gli elementi nella serie temporale
-                for elementi in time_series:
+                for elementi in self.time_series:
 
                     #divide la data in anno e mese
                     data = elementi[0].split("-")
@@ -87,7 +84,7 @@ class compute_avg_monthly_difference():
                     if data[0] != "date":
 
                         #per tutti gli anni inclusi nell'intervallo 
-                        if (self.first_year <= int(data[0]) <= self.last_year):
+                        if (int(self.first_year) <= int(data[0]) <= int(self.last_year)):
                         
                             #si considera il mese corrispondente 
                             if int(data[1]) == mese:
@@ -112,14 +109,3 @@ class compute_avg_monthly_difference():
     except:
         print("qualcosa non funziona, non sò cosa")
 
-#----------programma-----------
-
-#time_series_file = CSVTimeSeriesFile("data.csv")
-
-#time_series = time_series_file.get_data()
-
-#print(time_series)
-
-#lista_media = compute_avg_monthly_difference(time_series, 1949, 1951).diff()
-
-#print(lista_media)

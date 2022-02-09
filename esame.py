@@ -18,11 +18,12 @@ class CSVFile():
 class CSVTimeSeriesFile(CSVFile):
 
     try:
-        #inizializzo
+       
 
         #se il file non si può aprire
         try:
-
+            
+            #inizializzo
             def __init__(self, name):
 
                 self.name = name
@@ -124,10 +125,6 @@ class compute_avg_monthly_difference():
                 if len(self.t_s_clean[i]) > 2:
 
                     self.t_s_clean[i] = self.t_s_clean[i][:2]
-
-            #stampa di controllo
-            for riga in self.t_s_clean:
-                print(riga)
 
             #controllo se il tipo degli anni è stringa e non altri
             if type(first_year) != str:

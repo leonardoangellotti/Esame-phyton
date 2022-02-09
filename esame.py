@@ -1,24 +1,14 @@
+#-------- esame programmazione 2022 AIDA Leonardo Angellotti --------#
+
+#classe eccezioni
 class ExamException(Exception):
 
     pass
 
-class CSVFile():
-
-    #inizializzo
-    def __init__(self, name):
-
-        pass
-
-    #prende data e sales e li mette in una lista
-    def get_data(self, start = None, end = None):
-
-        pass
-
 #classe CVS file
-class CSVTimeSeriesFile(CSVFile):
+class CSVTimeSeriesFile():
 
     try:
-       
 
         #se il file non si può aprire
         try:

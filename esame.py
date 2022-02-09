@@ -103,7 +103,7 @@ class compute_avg_monthly_difference():
                     #secondo elemento è un mese: numero stringa convertibile in intero compreso tra uno e 12
                     #e se il secondo elemento è un numero stringa convertibile in intero positivo maggiore di 0
                     try:
-                        if int(riga[0].split('-')[0]) in range(1910,2022)  and int(riga[0].split('-')[1]) in range(1,12) and int(riga[1]) > 0:
+                        if int(riga[0].split('-')[0]) in range(1910,2023)  and int(riga[0].split('-')[1]) in range(1,13) and int(riga[1]) > 0:
 
                             #allora è una normale riga su cui si può operare,
                             #viene aggiunta alla serie temporale pulita
@@ -156,6 +156,15 @@ class compute_avg_monthly_difference():
          
                 raise ExamException("il primo anno non è strettamente minore del secondo")
 
+            #ciliegina sulla torta: prima del 1910 non esistevano i voli di linea
+            if int(self.first_year) < 1910:
+
+                raise ExamException("prima del 1910 non esistevano i voli di linea")
+
+            if int(self.last_year) < 1910:
+
+                raise ExamException("prima del 1910 non esistevano i voli di linea")
+
             #controllo se il primo e l'ultimo anno sono contenuti nella serie temporale (non è detto che i dati in input siano in ordine crescente)   
             anni = []
             
@@ -195,6 +204,7 @@ class compute_avg_monthly_difference():
 
                         raise ExamException("la lista non è ordinata in ordine crescente per gli anni")
             
+            #assunto che gli anni siano in ordine crescente
             #controlla l'ordine dei mesi
             #dato l'elemento i_esimo
             for i in range(0, len(self.t_s_clean) - 2):
@@ -202,7 +212,7 @@ class compute_avg_monthly_difference():
                 #considerato un anno
                 year = int(self.t_s_clean[i][0].split("-")[0])
 
-                lista_mesi = []
+                lista_ord_mesi = []
 
                 #se ci sono altri elementi successivi con quell'anno controlla se i mesi sono crescenti
                 for k in range(i + 1, len(self.t_s_clean) - 1):
@@ -210,17 +220,17 @@ class compute_avg_monthly_difference():
                     if int(self.t_s_clean[k][0].split("-")[0]) == year:
 
                         #aggiunge i mesi di quell'anno ad una lista vuota
-                        lista_mesi.append(self.t_s_clean[k][0].split("-")[1])
+                        lista_ord_mesi.append(self.t_s_clean[k][0].split("-")[1])
 
                 #se ci sono più elementi con lo stesso mese
-                if len(lista_mesi) > 1:
+                if len(lista_ord_mesi) > 1:
 
                     #controlla se i mesi sono crescenti per quell'anno
-                    for j in range(0, len(lista_mesi) - 2):
+                    for j in range(0, len(lista_ord_mesi) - 2):
 
-                        if lista_mesi[j] > lista_mesi[j + 1]:
+                        if lista_ord_mesi[j] >= lista_ord_mesi[j + 1]:
 
-                            raise ExamException("la lista non è ordinata in ordine crescente per i mesi")
+                            raise ExamException("la lista non è ordinata in ordine strettamente crescente per i mesi: i mesi non sono in ordine crescente o sono presenti duplicati.")
 
         #funzione differenza media mensile
         def diff(self):
@@ -232,9 +242,9 @@ class compute_avg_monthly_difference():
             n = int(self.last_year) - int(self.first_year)
 
             #per ogni mese
-            for mese in range(1,12):
+            for mese in range(1,13):
 
-                #lista dei valori corrispondenti quel mese negli anni
+                #lista del n.passeggeri corrispondenti in quel mese negli anni
                 lista_mese = []
 
                 #per tutti gli elementi nella serie temporale
@@ -257,11 +267,19 @@ class compute_avg_monthly_difference():
                 #variabile somma per la somamtoria al numeratore 
                 somma = 0
 
-                #per ogni anno in quel mese
-                for i in range(0, len(lista_mese) - 1):
+                #se per quel mese sono stati trovati più di due dati n.passeggeri
+                if len(lista_mese) >= 2:
 
-                    #sommatoria passeggeri
-                    somma = somma + (lista_mese[i + 1] - lista_mese[i])
+                    #per ogni anno in quel mese
+                    for i in range(0, len(lista_mese) - 1):
+
+                        #sommatoria passeggeri
+                        somma = somma + (lista_mese[i + 1] - lista_mese[i])
+
+                #altrimenti se la lista è vuota o contiene un solo elemento
+                elif len(lista_mese) <= 1:
+                    #non si procede con la sommatoria e la var somma rimane 0
+                    somma = 0
 
                 #si aggiunge alla lista la media
                 var_media.append(somma/n)
